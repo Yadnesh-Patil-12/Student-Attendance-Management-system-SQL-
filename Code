@@ -1,0 +1,175 @@
+-- Create Database
+create database attendance_management_system;
+use attendance_management_system;
+
+-- Teacher Table
+create table teacher (
+    id int primary key auto_increment,
+    name varchar(100) not null,
+    email varchar(100) unique not null,
+    department varchar(50) not null,
+    phoneno varchar(15) not null
+);
+
+-- Login Table
+create table login (
+    id int primary key auto_increment,
+    teacher_id int not null,
+    username varchar(50) unique not null,
+    password varchar(255) not null,
+    foreign key (teacher_id) references teacher(id)
+);
+
+-- Student Table
+create table student (
+    prn varchar(20) primary key,
+    name varchar(100) not null,
+    email varchar(100) unique not null,
+    department varchar(50) not null,
+    year int not null,
+    phoneno varchar(15) not null
+);
+
+-- Course Table
+create table course (
+    courseid int primary key auto_increment,
+    coursename varchar(100) unique not null,
+    department varchar(50) not null,
+    year int not null
+);
+
+-- Enrollment Table (to track which students are enrolled in which course)
+create table enrollment (
+    enrollment_id int primary key auto_increment,
+    prn varchar(20),
+    courseid int,
+    foreign key (prn) references student(prn),
+    foreign key (courseid) references course(courseid)
+);
+
+-- Attendance Table
+create table attendance (
+    id int primary key auto_increment,
+    student_prn varchar(20),
+    courseid int,
+    date date not null,
+    time time not null,
+    status enum('present', 'absent', 'late') not null,
+    foreign key (student_prn) references student(prn),
+    foreign key (courseid) references course(courseid)
+);
+
+-- Manage Table (to track which teacher manages which course)
+create table manage (
+    id int primary key auto_increment,
+    teacher_id int not null,
+    courseid int not null,
+    foreign key (teacher_id) references teacher(id),
+    foreign key (courseid) references course(courseid)
+);
+
+-- Insert Data into Teacher Table
+insert into teacher (name, email, department, phoneno) values
+('ganesh deshmukh', 'ganesh.deshmukh@pccoepune.org', 'computer engineering(rl)', '9876501234'),
+('minal shahakar', 'minal.shahakar@pccoepune.org', 'computer engineering(rl)', '9876352124'),
+('rajesh sharma', 'rajesh.sharma@pccoepune.org', 'electronics', '8872913282');
+
+-- Insert Data into Login Table
+insert into login (teacher_id, username, password) values
+(1, 'ganesh123', 'password123'),
+(2, 'sample23', 'securepass');
+
+-- Insert Data into Student Table
+insert into student (prn, name, email, department, year, phoneno) values
+('123B1D057', 'abhay bormale', 'abhay.bormale@example.com', 'computer science', 2, '9876543211'),
+('123B1D058', 'onkar chand', 'onkar.chand@example.com', 'computer science', 3, '9876543212'),
+('123B1D035', 'yadnesh patil', 'yadnesh.patil@example.com', 'electronics', 1, '9876543213'),
+('123B1D036', 'laxman patil', 'laxman.patil@example.com', 'electronics', 2, '9876543214');
+
+-- Insert Data into Course Table
+insert into course (coursename, department, year) values
+('data structures', 'computer science', 2),
+('microprocessors', 'electronics', 2),
+('database management', 'computer science', 3);
+
+-- Insert Data into Enrollment Table
+insert into enrollment (prn, courseid) values
+('123B1D057', 1),
+('123B1D058', 3),
+('123B1D035', 2),
+('123B1D036', 2);
+
+-- Insert Attendance Records
+insert into attendance (student_prn, courseid, date, time, status) values
+('123B1D057', 1, '2024-03-10', '10:00:00', 'present'),
+('123B1D058', 3, '2024-03-10', '11:00:00', 'absent'),
+('123B1D035', 2, '2024-03-10', '12:00:00', 'late'),
+('123B1D036', 2, '2024-03-10', '12:00:00', 'present');
+
+-- Insert Data into Manage Table
+insert into manage (teacher_id, courseid) values
+(1, 1),
+(2, 2),
+(3, 3);
+
+-- Display Data
+select * from teacher;
+select * from login;
+select * from student;
+select * from course;
+select * from attendance;
+
+-- Get Attendance of a Specific Student
+select * from attendance where student_prn = '123B1D035';
+
+-- Get All Courses Managed by a Specific Teacher
+select course.coursename 
+from course 
+join manage on course.courseid = manage.courseid 
+where manage.teacher_id = 1;
+
+-- Get Students Enrolled in a Specific Course
+select student.name, student.prn 
+from student 
+join enrollment on student.prn = enrollment.prn 
+where enrollment.courseid = 1;
+
+-- Get Attendance Report of a Specific Course
+select student.name, attendance.date, attendance.status 
+from attendance 
+join student on attendance.student_prn = student.prn 
+where attendance.courseid = 1;
+
+-- Update Student Information
+update student 
+set email = 'abhay@example.com' 
+where prn = '123B1D057';
+
+-- Update Attendance Record
+update attendance 
+set status = 'present' 
+where student_prn = '123B1D057' and date = '2024-03-10';
+
+-- Delete a Student Record
+-- Step 1: Delete attendance records related to the student
+delete from attendance where student_prn = '123B1D035';
+
+-- Step 2: Delete enrollment records related to the student
+delete from enrollment where prn = '123B1D035';
+
+-- Step 3: Now, delete the student record
+delete from student where prn = '123B1D035';
+
+
+-- Delete a Course
+-- Step 1: Delete attendance records related to the course
+delete from attendance where courseid = 2;
+
+-- Step 2: Delete enrollment records related to the course
+delete from enrollment where courseid = 2;
+
+-- Step 3: Delete manage records related to the course
+delete from manage where courseid = 2;
+
+-- Step 4: Now, delete the course
+delete from course where courseid = 2;
