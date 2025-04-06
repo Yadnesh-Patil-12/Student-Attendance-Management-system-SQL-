@@ -1,175 +1,323 @@
--- Create Database
-create database attendance_management_system;
-use attendance_management_system;
+-- Step 1: Create the database
+DROP DATABASE college_management;
+CREATE DATABASE IF NOT EXISTS college_management;
 
--- Teacher Table
-create table teacher (
-    id int primary key auto_increment,
-    name varchar(100) not null,
-    email varchar(100) unique not null,
-    department varchar(50) not null,
-    phoneno varchar(15) not null
+-- Step 2: Show all available databases
+SHOW DATABASES;
+
+-- Step 3: Select the database to use
+USE college_management;
+
+-- Creating student_details table
+CREATE TABLE IF NOT EXISTS student_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    roll_no VARCHAR(20) UNIQUE,
+    name VARCHAR(50)
 );
 
--- Login Table
-create table login (
-    id int primary key auto_increment,
-    teacher_id int not null,
-    username varchar(50) unique not null,
-    password varchar(255) not null,
-    foreign key (teacher_id) references teacher(id)
+-- Creating course_details table
+CREATE TABLE IF NOT EXISTS course_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(20) UNIQUE,
+    title VARCHAR(50),
+    credit INT
 );
 
--- Student Table
-create table student (
-    prn varchar(20) primary key,
-    name varchar(100) not null,
-    email varchar(100) unique not null,
-    department varchar(50) not null,
-    year int not null,
-    phoneno varchar(15) not null
+-- Creating faculty_details table
+CREATE TABLE IF NOT EXISTS faculty_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_name VARCHAR(20) UNIQUE,
+    name VARCHAR(100),
+    password VARCHAR(50)
 );
 
--- Course Table
-create table course (
-    courseid int primary key auto_increment,
-    coursename varchar(100) unique not null,
-    department varchar(50) not null,
-    year int not null
+-- Creating session_details table
+CREATE TABLE IF NOT EXISTS session_details (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    year INT,
+    term VARCHAR(50),
+    UNIQUE (year, term)
 );
 
--- Enrollment Table (to track which students are enrolled in which course)
-create table enrollment (
-    enrollment_id int primary key auto_increment,
-    prn varchar(20),
-    courseid int,
-    foreign key (prn) references student(prn),
-    foreign key (courseid) references course(courseid)
+-- Creating course_registration table
+CREATE TABLE IF NOT EXISTS course_registration (
+    student_id INT,
+    course_id INT,
+    session_id INT,
+    PRIMARY KEY (student_id, course_id, session_id)
 );
 
--- Attendance Table
-create table attendance (
-    id int primary key auto_increment,
-    student_prn varchar(20),
-    courseid int,
-    date date not null,
-    time time not null,
-    status enum('present', 'absent', 'late') not null,
-    foreign key (student_prn) references student(prn),
-    foreign key (courseid) references course(courseid)
+-- Creating course_allotment table
+CREATE TABLE IF NOT EXISTS course_allotment (
+    faculty_id INT,
+    course_id INT,
+    session_id INT,
+    PRIMARY KEY (faculty_id, course_id, session_id)
 );
 
--- Manage Table (to track which teacher manages which course)
-create table manage (
-    id int primary key auto_increment,
-    teacher_id int not null,
-    courseid int not null,
-    foreign key (teacher_id) references teacher(id),
-    foreign key (courseid) references course(courseid)
+-- Creating attendance_details table
+CREATE TABLE IF NOT EXISTS attendance_details (
+    faculty_id INT,
+    course_id INT,
+    session_id INT,
+    student_id INT,
+    on_date DATE,
+    status VARCHAR(10),
+    PRIMARY KEY (faculty_id, course_id, session_id, student_id, on_date)
 );
 
--- Insert Data into Teacher Table
-insert into teacher (name, email, department, phoneno) values
-('ganesh deshmukh', 'ganesh.deshmukh@pccoepune.org', 'computer engineering(rl)', '9876501234'),
-('minal shahakar', 'minal.shahakar@pccoepune.org', 'computer engineering(rl)', '9876352124'),
-('rajesh sharma', 'rajesh.sharma@pccoepune.org', 'electronics', '8872913282');
+-- Inserting data into student_details
+INSERT IGNORE INTO student_details (roll_no, name) VALUES 
+('123B1D001', 'Devraj Bafna'),
+('123B1D002', 'Adwait Kamble'),
+('123B1D003', 'Vardhan Khinvasara'),
+('123B1D004', 'Kaiwalya Ladkhedkar'),
+('123B1D005', 'Anuj Ahire'),
+('123B1D006', 'Samir Babar'),
+('123B1D007', 'Prasad Bange'),
+('123B1D008', 'Shreya Bhagat'),
+('123B1D009', 'Vishwajeet Bhamre'),
+('123B1D010', 'Prathamesh Bhangari'),
+('123B1D011', 'Aarush Borkar'),
+('123B1D012', 'Shreyash Chaudhari'),
+('123B1D013', 'Aniket Damedhar'),
+('123B1D014', 'Vijay Dhame'),
+('123B1D015', 'Sushant Didwagh'),
+('123B1D016', 'Tanaya Gaikwad'),
+('123B1D017', 'Virendra Gaikwad'),
+('123B1D018', 'Pratik Ghavate'),
+('123B1D019', 'Digvijay Gund'),
+('123B1D020', 'Amrita Iyer'),
+('123B1D021', 'Joel Emmanuel'),
+('123B1D022', 'Dhanashri Joshi'),
+('123B1D023', 'Shivam Kasodekar'),
+('123B1D024', 'Rajvardhan Khartode'),
+('123B1D025', 'Prathmesh Mane'),
+('123B1D026', 'Anushka Misal'),
+('123B1D027', 'Advait Nathe'),
+('123B1D028', 'Pankaj Gill'),
+('123B1D029', 'Ajim Pathan'),
+('123B1D030', 'Laxman Patil'),
+('123B1D031', 'Mihir Patil'),
+('123B1D032', 'Yadnesh Patil'),
+('123B1D033', 'Shashwati Pawar'),
+('123B1D034', 'Tushar Pawar'),
+('123B1D035', 'Prem Chaudhari'),
+('123B1D036', 'Pritesh Bagul'),
+('123B1D037', 'Dhruv Pujari'),
+('123B1D038', 'Nikhil Puppalwar'),
+('123B1D039', 'Atharv Sakhare'),
+('123B1D040', 'Shivam Salve'),
+('123B1D041', 'Sarthak Bagde'),
+('123B1D042', 'Yuvraj Shembale'),
+('123B1D043', 'Shruti Dhupad'),
+('123B1D044', 'Ishwari Shukla'),
+('123B1D045', 'Ishwar Sonawane'),
+('123B1D046', 'Pratiksha Talole'),
+('123B1D047', 'Tanyya Balwir'),
+('123B1D048', 'Tushar Nagwani'),
+('123B1D049', 'Keshav Valvi'),
+('123B1D050', 'Hiral Vende'),
+('123B1D051', 'Siddhesh Sarphale'),
+('123B1D052', 'Shivanee Surajiwale'),
+('123B1D053', 'Adhya Bhagat'),
+('123B1D054', 'Abhay Bormale'),
+('123B1D055', 'Onkar Chand'),
+('123B1D056', 'Atharva Desai'),
+('123B1D057', 'Janvee Ghadge'),
+('123B1D058', 'Yadnesh Neel'),
+('123B1D059', 'Nihar Salvi'),
+('123B1D061', 'Sakshi Patil'),
+('123B1D062', 'Mihik Shah'),
+('123B1D063', 'Suhani Thakare'),
+('123B1D064', 'Atharva Zope'),
+('123B1D065', 'Sagar Aradhye'),
+('123B1D066', 'Tanishka Kadam'),
+('123B1D067', 'Pooja Chile'),
+('123B1D068', 'Sanika Dethe'),
+('123B1D069', 'Sakshi Sankaye'),
+('123B1D070', 'Pallavi More'),
+('123B1D071', 'Siddharth Patil'),
+('123B1D072', 'Shivam Patil'),
+('123B1D073', 'Shivam Shinde'),
+('123B1D074', 'Siddharth Shinde'),
+('123B1D075', 'Shivam Thakur'),
+('123B1D076', 'Shivam Waghmare'),
+('123B1D077', 'Shivam Yadav'),
+('123B1D078', 'Raj Dalal'),
+('123B1D079', 'Mayur Katole'),
+('123B1D080', 'Harshvardhan Patil');
 
--- Insert Data into Login Table
-insert into login (teacher_id, username, password) values
-(1, 'ganesh123', 'password123'),
-(2, 'sample23', 'securepass');
+-- Inserting data into faculty_details
+INSERT IGNORE INTO faculty_details (user_name, password, name) VALUES
+('GD','123','Ganesh Deshmukh'),
+('MS','123','Minal Shahakar'),
+('SP','123','Sandeep Patil'),
+('AV','123','Ashwini Vaze'),
+('BD','123','Brijesh Deshmukh'),
+('RS','123','Rucha Shinde');
 
--- Insert Data into Student Table
-insert into student (prn, name, email, department, year, phoneno) values
-('123B1D057', 'abhay bormale', 'abhay.bormale@example.com', 'computer science', 2, '9876543211'),
-('123B1D058', 'onkar chand', 'onkar.chand@example.com', 'computer science', 3, '9876543212'),
-('123B1D035', 'yadnesh patil', 'yadnesh.patil@example.com', 'electronics', 1, '9876543213'),
-('123B1D036', 'laxman patil', 'laxman.patil@example.com', 'electronics', 2, '9876543214');
+-- Inserting data into session_details
+INSERT IGNORE INTO session_details (year, term) VALUES
+(2025, 'EVEN SEMESTER'),
+(2025, 'ODD SEMESTER');
 
--- Insert Data into Course Table
-insert into course (coursename, department, year) values
-('data structures', 'computer science', 2),
-('microprocessors', 'electronics', 2),
-('database management', 'computer science', 3);
+-- Inserting data into course_details
+INSERT IGNORE INTO course_details (title, code, credit) VALUES
+('Database Management System', 'CO321', 2),
+('Advanced Data Structure', 'CO215', 3),
+('Constitution Of India', 'CS112', 4),
+('Computational Techniques', 'CS670', 4),
+('Business Finance', 'CO432', 3),
+('Microprocessor Architecture', 'CS673', 1);
 
--- Insert Data into Enrollment Table
-insert into enrollment (prn, courseid) values
-('123B1D057', 1),
-('123B1D058', 3),
-('123B1D035', 2),
-('123B1D036', 2);
+-- Inserting data into course_registration
+INSERT INTO course_registration (student_id, course_id, session_id) VALUES
+(1, 1, 1), (1, 2, 1), (1, 3, 1),
+(2, 1, 1), (2, 2, 1), (2, 4, 1),
+(3, 2, 1), (3, 5, 1), (3, 6, 1),
+(4, 3, 1), (4, 2, 1), (4, 5, 1),
+(5, 1, 1), (5, 4, 1), (5, 6, 1),
+(80, 6, 2);
 
--- Insert Attendance Records
-insert into attendance (student_prn, courseid, date, time, status) values
-('123B1D057', 1, '2024-03-10', '10:00:00', 'present'),
-('123B1D058', 3, '2024-03-10', '11:00:00', 'absent'),
-('123B1D035', 2, '2024-03-10', '12:00:00', 'late'),
-('123B1D036', 2, '2024-03-10', '12:00:00', 'present');
+-- Inserting data into course_allotment
+INSERT INTO course_allotment (faculty_id, course_id, session_id) VALUES
+(1, 1, 1), (1, 2, 1), (1, 3, 1),
+(2, 2, 1), (2, 3, 1), (2, 4, 1),
+(3, 4, 1), (3, 5, 1), (3, 6, 1),
+(4, 1, 2), (4, 3, 2), (4, 4, 2),
+(5, 2, 2), (5, 5, 2), (5, 6, 2),
+(6, 3, 2), (6, 1, 2), (6, 5, 2);
 
--- Insert Data into Manage Table
-insert into manage (teacher_id, courseid) values
-(1, 1),
-(2, 2),
-(3, 3);
+-- ========================
+-- QUERIES
+-- ========================
 
--- Display Data
-select * from teacher;
-select * from login;
-select * from student;
-select * from course;
-select * from attendance;
+-- Retrieve all students
+SELECT * FROM student_details;
 
--- Get Attendance of a Specific Student
-select * from attendance where student_prn = '123B1D035';
+-- Retrieve all faculty members
+SELECT * FROM faculty_details;
 
--- Get All Courses Managed by a Specific Teacher
-select course.coursename 
-from course 
-join manage on course.courseid = manage.courseid 
-where manage.teacher_id = 1;
+-- Retrieve all courses
+SELECT * FROM course_details;
 
--- Get Students Enrolled in a Specific Course
-select student.name, student.prn 
-from student 
-join enrollment on student.prn = enrollment.prn 
-where enrollment.courseid = 1;
+-- Retrieve all sessions
+SELECT * FROM session_details;
 
--- Get Attendance Report of a Specific Course
-select student.name, attendance.date, attendance.status 
-from attendance 
-join student on attendance.student_prn = student.prn 
-where attendance.courseid = 1;
+-- Retrieve students registered for a specific course
+SELECT s.name, s.roll_no 
+FROM student_details s 
+JOIN course_registration cr ON s.id = cr.student_id 
+WHERE cr.course_id = 1;
 
--- Update Student Information
-update student 
-set email = 'abhay@example.com' 
-where prn = '123B1D057';
+-- List courses along with faculty names
+SELECT c.title, f.name 
+FROM course_details c 
+JOIN course_allotment ca ON c.id = ca.course_id 
+JOIN faculty_details f ON ca.faculty_id = f.id;
 
--- Update Attendance Record
-update attendance 
-set status = 'present' 
-where student_prn = '123B1D057' and date = '2024-03-10';
+-- Show students along with their registered courses
+SELECT s.name, c.title 
+FROM student_details s 
+JOIN course_registration cr ON s.id = cr.student_id 
+JOIN course_details c ON cr.course_id = c.id;
 
--- Delete a Student Record
--- Step 1: Delete attendance records related to the student
-delete from attendance where student_prn = '123B1D035';
+-- Get the faculty assigned to a specific course
+SELECT f.name 
+FROM faculty_details f 
+JOIN course_allotment ca ON f.id = ca.faculty_id 
+WHERE ca.course_id = 2;
 
--- Step 2: Delete enrollment records related to the student
-delete from enrollment where prn = '123B1D035';
+-- Find the students who have registered for more than two courses
+SELECT s.name, COUNT(cr.course_id) AS total_courses 
+FROM student_details s 
+JOIN course_registration cr ON s.id = cr.student_id 
+GROUP BY s.id 
+HAVING total_courses > 2;
 
--- Step 3: Now, delete the student record
-delete from student where prn = '123B1D035';
+-- Find courses assigned in a specific session
+SELECT c.title, s.year, s.term 
+FROM course_details c 
+JOIN course_allotment ca ON c.id = ca.course_id 
+JOIN session_details s ON ca.session_id = s.id;
 
+-- Find courses with more than 3 credits
+SELECT * FROM course_details WHERE credit > 3;
 
--- Delete a Course
--- Step 1: Delete attendance records related to the course
-delete from attendance where courseid = 2;
+-- Get all students with names starting with "A"
+SELECT * FROM student_details WHERE name LIKE 'A%';
 
--- Step 2: Delete enrollment records related to the course
-delete from enrollment where courseid = 2;
+-- List all faculty names in alphabetical order
+SELECT * FROM faculty_details ORDER BY name ASC;
 
--- Step 3: Delete manage records related to the course
-delete from manage where courseid = 2;
+-- Retrieve student details sorted by roll number
+SELECT * FROM student_details ORDER BY roll_no ASC;
 
--- Step 4: Now, delete the course
-delete from course where courseid = 2;
+-- Get session details sorted by year and term
+SELECT * FROM session_details ORDER BY year DESC, term ASC;
+
+-- Count the total number of students
+SELECT COUNT(*) FROM student_details;
+
+-- Count the total number of courses
+SELECT COUNT(*) FROM course_details;
+
+-- Count how many students are enrolled in each course
+SELECT c.title, COUNT(cr.student_id) AS total_students 
+FROM course_details c 
+JOIN course_registration cr ON c.id = cr.course_id 
+GROUP BY c.id;
+
+-- Get the total number of faculties
+SELECT COUNT(*) FROM faculty_details;
+
+-- Get the faculty who has been assigned the most courses
+SELECT f.name, COUNT(ca.course_id) AS total_courses 
+FROM faculty_details f 
+JOIN course_allotment ca ON f.id = ca.faculty_id 
+GROUP BY f.id 
+ORDER BY total_courses DESC 
+LIMIT 1;
+
+-- Get attendance details for a specific student
+SELECT * FROM attendance_details WHERE student_id = 1;
+
+-- Count the total attendance records per student
+SELECT student_id, COUNT(*) AS attendance_count 
+FROM attendance_details 
+GROUP BY student_id;
+
+-- Find students who were absent on a specific date
+SELECT s.name 
+FROM student_details s 
+JOIN attendance_details a ON s.id = a.student_id 
+WHERE a.on_date = '2025-03-15' AND a.status = 'Absent';
+
+-- Get the attendance percentage of a student
+SELECT student_id, 
+       (SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) AS attendance_percentage 
+FROM attendance_details 
+WHERE student_id = 1 
+GROUP BY student_id;
+
+-- Find the course with the highest attendance percentage
+SELECT c.title, 
+       (SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) AS attendance_percentage 
+FROM course_details c 
+JOIN attendance_details a ON c.id = a.course_id 
+GROUP BY c.id 
+ORDER BY attendance_percentage DESC 
+LIMIT 1;
+
+-- Update a student's name
+UPDATE student_details SET name = 'Updated Name' WHERE roll_no = '123B1D001';
+
+-- Update a faculty's password
+UPDATE faculty_details SET password = 'newpassword' WHERE user_name = 'GD';
+
+-- Delete a student by roll number
+DELETE FROM student_details WHERE roll_no = '123B1D080';
+
+-- Remove a faculty member from course allotment
+DELETE FROM course_allotment WHERE faculty_id = 3 AND course_id = 4;
